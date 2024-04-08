@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 */
 
+#include "utils_load_library.h"
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -21,7 +23,6 @@
 #include "utils_assert.h"
 #include "utils_common.h"
 #include "utils_concurrency.h"
-#include "utils_load_library.h"
 #include "utils_log.h"
 #include "utils_sanitizers.h"
 
@@ -57,23 +58,29 @@ static UTIL_ONCE_FLAG ze_is_initialized = UTIL_ONCE_FLAG_INIT;
 static bool Init_ze_global_state_failed;
 
 static void init_ze_global_state(void) {
+#ifdef _WIN32
+    const char *lib_name = "ze_loader.dll";
+#else
+    const char *lib_name = "libze_loader.so";
+#endif
     // check if Level Zero shared library is already loaded
     // we pass 0 as a handle to search the global symbol table
     *(void **)&g_ze_ops.zeMemAllocHost =
-        util_get_symbol_addr(0, "zeMemAllocHost");
+        util_get_symbol_addr(0, "zeMemAllocHost", lib_name);
     *(void **)&g_ze_ops.zeMemAllocDevice =
-        util_get_symbol_addr(0, "zeMemAllocDevice");
+        util_get_symbol_addr(0, "zeMemAllocDevice", lib_name);
     *(void **)&g_ze_ops.zeMemAllocShared =
-        util_get_symbol_addr(0, "zeMemAllocShared");
-    *(void **)&g_ze_ops.zeMemFree = util_get_symbol_addr(0, "zeMemFree");
+        util_get_symbol_addr(0, "zeMemAllocShared", lib_name);
+    *(void **)&g_ze_ops.zeMemFree =
+        util_get_symbol_addr(0, "zeMemFree", lib_name);
     *(void **)&g_ze_ops.zeMemGetIpcHandle =
-        util_get_symbol_addr(0, "zeMemGetIpcHandle");
+        util_get_symbol_addr(0, "zeMemGetIpcHandle", lib_name);
     *(void **)&g_ze_ops.zeMemPutIpcHandle =
-        util_get_symbol_addr(0, "zeMemPutIpcHandle");
+        util_get_symbol_addr(0, "zeMemPutIpcHandle", lib_name);
     *(void **)&g_ze_ops.zeMemOpenIpcHandle =
-        util_get_symbol_addr(0, "zeMemOpenIpcHandle");
+        util_get_symbol_addr(0, "zeMemOpenIpcHandle", lib_name);
     *(void **)&g_ze_ops.zeMemCloseIpcHandle =
-        util_get_symbol_addr(0, "zeMemCloseIpcHandle");
+        util_get_symbol_addr(0, "zeMemCloseIpcHandle", lib_name);
 
     if (!g_ze_ops.zeMemAllocHost || !g_ze_ops.zeMemAllocDevice ||
         !g_ze_ops.zeMemAllocShared || !g_ze_ops.zeMemFree ||

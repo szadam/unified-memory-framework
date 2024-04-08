@@ -2,9 +2,15 @@
 // Under the Apache License v2.0 with LLVM Exceptions. See LICENSE.TXT.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#include <dlfcn.h>
-#include <level_zero/ze_api.h>
+#include "utils_load_library.h"
 
+#ifdef _WIN32
+//workaround for std::numeric_limits on windows
+#define NOMINMAX
+#include <ze_api.h>
+#else
+#include <level_zero/ze_api.h>
+#endif
 #include "pool.hpp"
 #include "umf/providers/provider_level_zero.h"
 
@@ -62,67 +68,77 @@ struct umfLevelZeroProviderTest : umf_test::test {
 
 #if USE_DLOPEN
     void InitLevelZeroOps() {
+#ifdef _WIN32
+        const char *lib_name = "ze_loader.dll";
+#else
+        const char *lib_name = "libze_loader.so";
+#endif
         // Load Level Zero symbols
-        // NOTE that we use RTLD_GLOBAL which add all loaded symbols to the
-        // global symbol table. These symbols would be used by the Level Zero
-        // provider later
-        zeDlHandle = dlopen("libze_loader.so", RTLD_GLOBAL | RTLD_LAZY);
-
-        *(void **)&libze_ops.zeInit = dlsym(zeDlHandle, "zeInit");
+        // NOTE that we use UMF_UTIL_OPEN_LIBRARY_GLOBAL which add all loaded symbols to the
+        // global symbol table.
+        zeDlHandle = util_open_library(lib_name, UMF_UTIL_OPEN_LIBRARY_GLOBAL);
+        *(void **)&libze_ops.zeInit =
+            util_get_symbol_addr(zeDlHandle, "zeInit", lib_name);
         ASSERT_NE(libze_ops.zeInit, nullptr);
-        *(void **)&libze_ops.zeDriverGet = dlsym(zeDlHandle, "zeDriverGet");
+        *(void **)&libze_ops.zeDriverGet =
+            util_get_symbol_addr(zeDlHandle, "zeDriverGet", lib_name);
         ASSERT_NE(libze_ops.zeDriverGet, nullptr);
-        *(void **)&libze_ops.zeDeviceGet = dlsym(zeDlHandle, "zeDeviceGet");
+        *(void **)&libze_ops.zeDeviceGet =
+            util_get_symbol_addr(zeDlHandle, "zeDeviceGet", lib_name);
         ASSERT_NE(libze_ops.zeDeviceGet, nullptr);
         *(void **)&libze_ops.zeDeviceGetProperties =
-            dlsym(zeDlHandle, "zeDeviceGetProperties");
+            util_get_symbol_addr(zeDlHandle, "zeDeviceGetProperties", lib_name);
         ASSERT_NE(libze_ops.zeDeviceGetProperties, nullptr);
         *(void **)&libze_ops.zeContextCreate =
-            dlsym(zeDlHandle, "zeContextCreate");
+            util_get_symbol_addr(zeDlHandle, "zeContextCreate", lib_name);
         ASSERT_NE(libze_ops.zeContextCreate, nullptr);
         *(void **)&libze_ops.zeContextDestroy =
-            dlsym(zeDlHandle, "zeContextDestroy");
+            util_get_symbol_addr(zeDlHandle, "zeContextDestroy", lib_name);
         ASSERT_NE(libze_ops.zeContextDestroy, nullptr);
         *(void **)&libze_ops.zeCommandQueueCreate =
-            dlsym(zeDlHandle, "zeCommandQueueCreate");
+            util_get_symbol_addr(zeDlHandle, "zeCommandQueueCreate", lib_name);
         ASSERT_NE(libze_ops.zeCommandQueueCreate, nullptr);
         *(void **)&libze_ops.zeCommandQueueDestroy =
-            dlsym(zeDlHandle, "zeCommandQueueDestroy");
+            util_get_symbol_addr(zeDlHandle, "zeCommandQueueDestroy", lib_name);
         ASSERT_NE(libze_ops.zeCommandQueueDestroy, nullptr);
         *(void **)&libze_ops.zeCommandQueueExecuteCommandLists =
-            dlsym(zeDlHandle, "zeCommandQueueExecuteCommandLists");
+            util_get_symbol_addr(zeDlHandle,
+                                 "zeCommandQueueExecuteCommandLists", lib_name);
         ASSERT_NE(libze_ops.zeCommandQueueExecuteCommandLists, nullptr);
-        *(void **)&libze_ops.zeCommandQueueSynchronize =
-            dlsym(zeDlHandle, "zeCommandQueueSynchronize");
+        *(void **)&libze_ops.zeCommandQueueSynchronize = util_get_symbol_addr(
+            zeDlHandle, "zeCommandQueueSynchronize", lib_name);
         ASSERT_NE(libze_ops.zeCommandQueueSynchronize, nullptr);
         *(void **)&libze_ops.zeCommandListCreate =
-            dlsym(zeDlHandle, "zeCommandListCreate");
+            util_get_symbol_addr(zeDlHandle, "zeCommandListCreate", lib_name);
         ASSERT_NE(libze_ops.zeCommandListCreate, nullptr);
         *(void **)&libze_ops.zeCommandListDestroy =
-            dlsym(zeDlHandle, "zeCommandListDestroy");
+            util_get_symbol_addr(zeDlHandle, "zeCommandListDestroy", lib_name);
         ASSERT_NE(libze_ops.zeCommandListDestroy, nullptr);
         *(void **)&libze_ops.zeCommandListClose =
-            dlsym(zeDlHandle, "zeCommandListClose");
+            util_get_symbol_addr(zeDlHandle, "zeCommandListClose", lib_name);
         ASSERT_NE(libze_ops.zeCommandListClose, nullptr);
         *(void **)&libze_ops.zeCommandListAppendMemoryCopy =
-            dlsym(zeDlHandle, "zeCommandListAppendMemoryCopy");
+            util_get_symbol_addr(zeDlHandle, "zeCommandListAppendMemoryCopy",
+                                 lib_name);
         ASSERT_NE(libze_ops.zeCommandListAppendMemoryCopy, nullptr);
         *(void **)&libze_ops.zeCommandListAppendMemoryFill =
-            dlsym(zeDlHandle, "zeCommandListAppendMemoryFill");
+            util_get_symbol_addr(zeDlHandle, "zeCommandListAppendMemoryFill",
+                                 lib_name);
         ASSERT_NE(libze_ops.zeCommandListAppendMemoryFill, nullptr);
-        *(void **)&libze_ops.zeMemGetAllocProperties =
-            dlsym(zeDlHandle, "zeMemGetAllocProperties");
+        *(void **)&libze_ops.zeMemGetAllocProperties = util_get_symbol_addr(
+            zeDlHandle, "zeMemGetAllocProperties", lib_name);
         ASSERT_NE(libze_ops.zeMemGetAllocProperties, nullptr);
         *(void **)&libze_ops.zeMemAllocDevice =
-            dlsym(zeDlHandle, "zeMemAllocDevice");
+            util_get_symbol_addr(zeDlHandle, "zeMemAllocDevice", lib_name);
         ASSERT_NE(libze_ops.zeMemAllocDevice, nullptr);
-        *(void **)&libze_ops.zeMemFree = dlsym(zeDlHandle, "zeMemFree");
+        *(void **)&libze_ops.zeMemFree =
+            util_get_symbol_addr(zeDlHandle, "zeMemFree", lib_name);
         ASSERT_NE(libze_ops.zeMemFree, nullptr);
     }
 
     void DestroyLevelZeroOps() {
         // Just close the handle here
-        dlclose(zeDlHandle);
+        util_close_library(zeDlHandle);
     }
 #else  // USE_DLOPEN
     void InitLevelZeroOps() {

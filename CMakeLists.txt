@@ -61,6 +61,7 @@ endif()
 # set, because in this case the build type is determined after a CMake
 # configuration is done (at the build time)
 if(NOT WINDOWS)
+    add_compile_definitions(_GNU_SOURCE=1)
     set(KNOWN_BUILD_TYPES Release Debug RelWithDebInfo MinSizeRel)
     string(REPLACE ";" " " KNOWN_BUILD_TYPES_STR "${KNOWN_BUILD_TYPES}")
 
@@ -253,6 +254,17 @@ endif()
 if(UMF_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
+
+# Conditional configuration for Level Zero provider
+if(UMF_BUILD_LEVEL_ZERO_PROVIDER)
+    set(OPTIONAL_SYMBOLS "umfLevelZeroMemoryProviderOps")
+else()
+    set(OPTIONAL_SYMBOLS "")
+endif()
+
+# Configure the DEF file based on whether Level Zero provider is built
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/libumf.def.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/src/libumf.def" @ONLY)
 
 if(UMF_FORMAT_CODE_STYLE)
     find_program(CLANG_FORMAT NAMES clang-format-15 clang-format-15.0

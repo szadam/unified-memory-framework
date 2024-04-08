@@ -10,7 +10,6 @@
 #ifdef _WIN32
 #include <windows.h>
 #else
-#define _GNU_SOURCE 1
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <unistd.h>

@@ -70,5 +70,5 @@ int os_purge(void *addr, size_t length, int advice) {
 }
 
 void os_strerror(int errnum, char *buf, size_t buflen) {
-    strerror_r(errnum, buf, buflen);
+    (void)strerror_r(errnum, buf, buflen);
 }
