@@ -2,8 +2,6 @@
 // Under the Apache License v2.0 with LLVM Exceptions. See LICENSE.TXT.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-#include "utils_load_library.h"
-
 #ifdef _WIN32
 //workaround for std::numeric_limits on windows
 #define NOMINMAX
@@ -13,6 +11,7 @@
 #endif
 #include "pool.hpp"
 #include "umf/providers/provider_level_zero.h"
+#include "utils_load_library.h"
 
 using umf_test::test;
 using namespace umf_test;

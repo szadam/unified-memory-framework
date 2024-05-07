@@ -7,8 +7,6 @@
  *
  */
 
-#include "utils_load_library.h"
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -25,6 +23,7 @@
 #include "base_alloc_global.h"
 #include "utils_common.h"
 #include "utils_concurrency.h"
+#include "utils_load_library.h"
 #include "utils_log.h"
 #include "utils_sanitizers.h"
 
