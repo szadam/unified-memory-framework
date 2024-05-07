@@ -49,10 +49,10 @@ function(add_umf_test)
 
     set(TEST_LIBS
         test_common
-        umf
         ${ARG_LIBS}
         GTest::gtest_main
-        ${LIBS_OPTIONAL})
+        ${LIBS_OPTIONAL}
+        umf)
 
     add_umf_executable(
         NAME ${TEST_TARGET_NAME}

@@ -14,11 +14,10 @@
 #ifndef UMF_LOAD_LIBRARY_H
 #define UMF_LOAD_LIBRARY_H 1
 
-#define UMF_UTIL_OPEN_LIBRARY_GLOBAL 1
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+#define UMF_UTIL_OPEN_LIBRARY_GLOBAL 1
 
 void *util_open_library(const char *filename, int userFlags);
 int util_close_library(void *handle);

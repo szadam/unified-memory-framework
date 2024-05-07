@@ -7,26 +7,22 @@
  *
  */
 
-/*
- * Including this header forces linking with libdl on Linux.
- */
-#define _GNU_SOURCE 1
-
-#include "utils_load_library.h"
-
-#ifdef _WIN32 /* Windows */
+#ifdef _WIN32
 
 #include <windows.h>
-
 #include <libloaderapi.h>
 
-#else /* Linux */
+#else
+
+#define _GNU_SOURCE 1
 
 #include <dlfcn.h> // forces linking with libdl on Linux
 
-#endif /* _WIN32 */
+#endif
 
-#ifdef _WIN32 /* Windows */
+#include "utils_load_library.h"
+
+#ifdef _WIN32
 
 void *util_open_library(const char *filename, int userFlags) {
     (void)userFlags; //unused for win
@@ -71,4 +67,4 @@ void *util_get_symbol_addr(void *handle, const char *symbol,
     return dlsym(handle, symbol);
 }
 
-#endif /* _WIN32 */
+#endif

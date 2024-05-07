@@ -8,7 +8,7 @@ if(UMF_BUILD_LIBUMF_POOL_SCALABLE AND UMF_ENABLE_POOL_TRACKING)
     add_umf_executable(
         NAME ${EXAMPLE_NAME}
         SRCS basic/basic.c
-        LIBS umf scalable_pool)
+        LIBS scalable_pool umf)
 
     target_include_directories(
         ${EXAMPLE_NAME} PRIVATE ${UMF_CMAKE_SOURCE_DIR}/src/utils
@@ -41,7 +41,7 @@ if(UMF_BUILD_GPU_EXAMPLES
     add_umf_executable(
         NAME ${EXAMPLE_NAME}
         SRCS basic/gpu_shared_memory.c
-        LIBS umf disjoint_pool ze_loader)
+        LIBS disjoint_pool ze_loader umf)
 
     target_include_directories(
         ${EXAMPLE_NAME}
@@ -82,7 +82,7 @@ if(UMF_BUILD_GPU_EXAMPLES
     add_umf_executable(
         NAME ${EXAMPLE_NAME}
         SRCS basic/ipc_level_zero.c
-        LIBS umf disjoint_pool ze_loader)
+        LIBS disjoint_pool ze_loader umf)
 
     target_include_directories(
         ${EXAMPLE_NAME}

@@ -226,7 +226,7 @@ elseif(UMF_PROXY_LIB_BASED_ON_POOL STREQUAL JEMALLOC)
     if(UMF_BUILD_LIBUMF_POOL_JEMALLOC)
         set(UMF_PROXY_LIB_ENABLED ON)
         set(PROXY_LIB_USES_JEMALLOC_POOL ON)
-        set(PROXY_LIBS umf jemalloc_pool)
+        set(PROXY_LIBS jemalloc_pool umf)
     else()
         message(
             STATUS
