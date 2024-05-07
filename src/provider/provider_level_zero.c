@@ -5,8 +5,6 @@
  * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 */
 
-#include "utils_load_library.h"
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -23,6 +21,7 @@
 #include "utils_assert.h"
 #include "utils_common.h"
 #include "utils_concurrency.h"
+#include "utils_load_library.h"
 #include "utils_log.h"
 #include "utils_sanitizers.h"
 

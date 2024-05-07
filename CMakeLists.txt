@@ -61,7 +61,6 @@ endif()
 # set, because in this case the build type is determined after a CMake
 # configuration is done (at the build time)
 if(NOT WINDOWS)
-    add_compile_definitions(_GNU_SOURCE=1)
     set(KNOWN_BUILD_TYPES Release Debug RelWithDebInfo MinSizeRel)
     string(REPLACE ";" " " KNOWN_BUILD_TYPES_STR "${KNOWN_BUILD_TYPES}")
 
@@ -216,7 +215,7 @@ if(UMF_PROXY_LIB_BASED_ON_POOL STREQUAL SCALABLE)
     if(UMF_BUILD_LIBUMF_POOL_SCALABLE)
         set(UMF_PROXY_LIB_ENABLED ON)
         set(PROXY_LIB_USES_SCALABLE_POOL ON)
-        set(PROXY_LIBS umf scalable_pool)
+        set(PROXY_LIBS scalable_pool)
     else()
         message(
             STATUS
