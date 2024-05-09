@@ -67,6 +67,15 @@ struct libze_ops {
 } libze_ops;
 
 #if USE_DLOPEN
+struct DlHandleCloser {
+    void operator()(void *dlHandle) {
+        if (dlHandle) {
+            util_close_library(dlHandle);
+        }
+    }
+};
+
+std::unique_ptr<void, DlHandleCloser> zeDlHandle = nullptr;
 void InitLevelZeroOps() {
 #ifdef _WIN32
     const char *lib_name = "ze_loader.dll";
@@ -76,68 +85,64 @@ void InitLevelZeroOps() {
     // Load Level Zero symbols
     // NOTE that we use UMF_UTIL_OPEN_LIBRARY_GLOBAL which add all loaded symbols to the
     // global symbol table.
-    zeDlHandle = util_open_library(lib_name, UMF_UTIL_OPEN_LIBRARY_GLOBAL);
+    zeDlHandle = std::unique_ptr<void, DlHandleCloser>(util_open_library(lib_name, UMF_UTIL_OPEN_LIBRARY_GLOBAL));
     *(void **)&libze_ops.zeInit =
-        util_get_symbol_addr(zeDlHandle, "zeInit", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeInit", lib_name);
     ASSERT_NE(libze_ops.zeInit, nullptr);
     *(void **)&libze_ops.zeDriverGet =
-        util_get_symbol_addr(zeDlHandle, "zeDriverGet", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeDriverGet", lib_name);
     ASSERT_NE(libze_ops.zeDriverGet, nullptr);
     *(void **)&libze_ops.zeDeviceGet =
-        util_get_symbol_addr(zeDlHandle, "zeDeviceGet", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeDeviceGet", lib_name);
     ASSERT_NE(libze_ops.zeDeviceGet, nullptr);
     *(void **)&libze_ops.zeDeviceGetProperties =
-        util_get_symbol_addr(zeDlHandle, "zeDeviceGetProperties", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeDeviceGetProperties", lib_name);
     ASSERT_NE(libze_ops.zeDeviceGetProperties, nullptr);
     *(void **)&libze_ops.zeContextCreate =
-        util_get_symbol_addr(zeDlHandle, "zeContextCreate", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeContextCreate", lib_name);
     ASSERT_NE(libze_ops.zeContextCreate, nullptr);
     *(void **)&libze_ops.zeContextDestroy =
-        util_get_symbol_addr(zeDlHandle, "zeContextDestroy", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeContextDestroy", lib_name);
     ASSERT_NE(libze_ops.zeContextDestroy, nullptr);
     *(void **)&libze_ops.zeCommandQueueCreate =
-        util_get_symbol_addr(zeDlHandle, "zeCommandQueueCreate", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeCommandQueueCreate", lib_name);
     ASSERT_NE(libze_ops.zeCommandQueueCreate, nullptr);
     *(void **)&libze_ops.zeCommandQueueDestroy =
-        util_get_symbol_addr(zeDlHandle, "zeCommandQueueDestroy", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeCommandQueueDestroy", lib_name);
     ASSERT_NE(libze_ops.zeCommandQueueDestroy, nullptr);
     *(void **)&libze_ops.zeCommandQueueExecuteCommandLists =
-        util_get_symbol_addr(zeDlHandle, "zeCommandQueueExecuteCommandLists",
+        util_get_symbol_addr(zeDlHandle.get(), "zeCommandQueueExecuteCommandLists",
                              lib_name);
     ASSERT_NE(libze_ops.zeCommandQueueExecuteCommandLists, nullptr);
     *(void **)&libze_ops.zeCommandQueueSynchronize =
-        util_get_symbol_addr(zeDlHandle, "zeCommandQueueSynchronize", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeCommandQueueSynchronize", lib_name);
     ASSERT_NE(libze_ops.zeCommandQueueSynchronize, nullptr);
     *(void **)&libze_ops.zeCommandListCreate =
-        util_get_symbol_addr(zeDlHandle, "zeCommandListCreate", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeCommandListCreate", lib_name);
     ASSERT_NE(libze_ops.zeCommandListCreate, nullptr);
     *(void **)&libze_ops.zeCommandListDestroy =
-        util_get_symbol_addr(zeDlHandle, "zeCommandListDestroy", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeCommandListDestroy", lib_name);
     ASSERT_NE(libze_ops.zeCommandListDestroy, nullptr);
     *(void **)&libze_ops.zeCommandListClose =
-        util_get_symbol_addr(zeDlHandle, "zeCommandListClose", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeCommandListClose", lib_name);
     ASSERT_NE(libze_ops.zeCommandListClose, nullptr);
     *(void **)&libze_ops.zeCommandListAppendMemoryCopy = util_get_symbol_addr(
-        zeDlHandle, "zeCommandListAppendMemoryCopy", lib_name);
+        zeDlHandle.get(), "zeCommandListAppendMemoryCopy", lib_name);
     ASSERT_NE(libze_ops.zeCommandListAppendMemoryCopy, nullptr);
     *(void **)&libze_ops.zeCommandListAppendMemoryFill = util_get_symbol_addr(
-        zeDlHandle, "zeCommandListAppendMemoryFill", lib_name);
+        zeDlHandle.get(), "zeCommandListAppendMemoryFill", lib_name);
     ASSERT_NE(libze_ops.zeCommandListAppendMemoryFill, nullptr);
     *(void **)&libze_ops.zeMemGetAllocProperties =
-        util_get_symbol_addr(zeDlHandle, "zeMemGetAllocProperties", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeMemGetAllocProperties", lib_name);
     ASSERT_NE(libze_ops.zeMemGetAllocProperties, nullptr);
     *(void **)&libze_ops.zeMemAllocDevice =
-        util_get_symbol_addr(zeDlHandle, "zeMemAllocDevice", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeMemAllocDevice", lib_name);
     ASSERT_NE(libze_ops.zeMemAllocDevice, nullptr);
     *(void **)&libze_ops.zeMemFree =
-        util_get_symbol_addr(zeDlHandle, "zeMemFree", lib_name);
+        util_get_symbol_addr(zeDlHandle.get(), "zeMemFree", lib_name);
     ASSERT_NE(libze_ops.zeMemFree, nullptr);
 }
 
-void DestroyLevelZeroOps() {
-    // Just close the handle here
-    util_close_library(zeDlHandle);
-}
 #else  // USE_DLOPEN
 void InitLevelZeroOps() {
     // Level Zero is linked statically but we prepare ops structure to
@@ -486,9 +491,14 @@ INSTANTIATE_TEST_SUITE_P(
         LevelZeroProviderTestParams{l0Params_device_memory, &l0Accessor},
         LevelZeroProviderTestParams{l0Params_shared_memory, &hostAccessor},
         LevelZeroProviderTestParams{l0Params_host_memory, &hostAccessor}));
+#ifdef _WIN32
+
+GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(umfIpcTest);
+#else
 
 INSTANTIATE_TEST_SUITE_P(umfLevelZeroProviderTestSuite, umfIpcTest,
                          ::testing::Values(ipcTestParams{
                              umfProxyPoolOps(), nullptr,
                              umfLevelZeroMemoryProviderOps(),
                              &l0Params_device_memory, &l0Accessor}));
+#endif
