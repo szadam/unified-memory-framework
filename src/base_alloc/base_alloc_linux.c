@@ -29,6 +29,7 @@ void *ba_os_alloc(size_t size) {
 }
 
 void ba_os_free(void *ptr, size_t size) {
+    utils_annotate_memory_inaccessible(ptr, size);
     int ret = munmap(ptr, size);
     assert(ret == 0);
     (void)ret; // unused

@@ -82,7 +82,10 @@ void *os_mmap(void *hint_addr, size_t length, int prot, int flag, int fd,
     return ptr;
 }
 
-int os_munmap(void *addr, size_t length) { return munmap(addr, length); }
+int os_munmap(void *addr, size_t length) {
+    utils_annotate_memory_inaccessible(addr, length);
+    return munmap(addr, length);
+}
 
 size_t os_get_page_size(void) { return sysconf(_SC_PAGE_SIZE); }
 
