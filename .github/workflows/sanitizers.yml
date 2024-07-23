@@ -4,7 +4,8 @@ name: Sanitizers
 on: workflow_call
 
 env:
-  BUILD_DIR : "${{github.workspace}}/build/"
+  BUILD_DIR : "${{github.workspace}}/build"
+  INSTL_DIR : "${{github.workspace}}/../install-dir"
 
 permissions:
   contents: read
@@ -22,6 +23,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      with:
+        fetch-depth: 0
 
     - name: Install apt packages
       run: |
@@ -46,6 +49,7 @@ jobs:
         ${{ matrix.compiler.cxx == 'icpx' && '. /opt/intel/oneapi/setvars.sh &&' || ''}} 
         cmake
         -B ${{env.BUILD_DIR}}
+        -DCMAKE_INSTALL_PREFIX="${{env.INSTL_DIR}}"
         -DCMAKE_BUILD_TYPE=Debug
         -DUMF_BUILD_SHARED_LIBRARY=OFF
         -DCMAKE_C_COMPILER=${{matrix.compiler.c}}
@@ -68,9 +72,7 @@ jobs:
       working-directory: ${{env.BUILD_DIR}}
       run: > 
         ${{ matrix.compiler.cxx == 'icpx' && '. /opt/intel/oneapi/setvars.sh &&' || ''}}
-        GTEST_FILTER="-*umfProviderTest.alloc_page64_align_0*" ctest --output-on-failure
-      # TO DO: fix umf-provider_os_memory test for sanitizers
-      # issue 581: https://github.com/oneapi-src/unified-memory-framework/issues/581
+        ctest --output-on-failure
 
   windows-build:
     name: cl and clang-cl on Windows
@@ -86,6 +88,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      with:
+        fetch-depth: 0
 
     # Use the latest MSVC toolset available, when compiling UMF with ASan.
     # Running binaries compiled with older toolsets results in a
@@ -103,7 +107,7 @@ jobs:
       uses: lukka/run-vcpkg@5e0cab206a5ea620130caf672fce3e4a6b5666a1 # v11.5
       with:
         vcpkgGitCommitId: 3dd44b931481d7a8e9ba412621fa810232b66289
-        vcpkgDirectory: ${{github.workspace}}/build/vcpkg
+        vcpkgDirectory: ${{env.BUILD_DIR}}/vcpkg
         vcpkgJsonGlob: '**/vcpkg.json'
 
     - name: Install dependencies
@@ -115,6 +119,7 @@ jobs:
       run: >
         cmake
         -B ${{env.BUILD_DIR}}
+        -DCMAKE_INSTALL_PREFIX="${{env.INSTL_DIR}}"
         -DCMAKE_C_COMPILER=${{matrix.compiler.c}}
         -DCMAKE_CXX_COMPILER=${{matrix.compiler.cxx}}
         -DCMAKE_PREFIX_PATH="${{env.VCPKG_PATH}}"
